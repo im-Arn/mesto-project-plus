@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import routes from './routes/index';
 
@@ -12,7 +12,7 @@ mongoose.set('strictQuery', true);
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
 // Исп мидлвару с моковым пользователем
-app.use((req: Request | any, res: Response, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   req.user = {
     _id: '667cd4ee7bea4e0fac2c6415', // вставьте сюда _id созданного в предыдущем пункте пользователя
   };

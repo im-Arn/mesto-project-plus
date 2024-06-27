@@ -8,12 +8,12 @@ import {
 } from '../controllers/users';
 
 // Cоздаём роутер и роуты
-const UserRouter = Router();
+const userRouter = Router();
 
-UserRouter.post('/', createUser);
-UserRouter.patch('/me', updateUser);
-UserRouter.get('/', getAllUsers);
-UserRouter.get('/:userId', getUser);
-UserRouter.patch('/me/avatar', updateAvatar);
+userRouter.post('/', createUser);
+userRouter.patch('/me', updateUser);
+userRouter.get('/', getAllUsers);
+userRouter.get('/:userId', getUser);
+userRouter.patch('/me/avatar', updateAvatar);
 
-export default UserRouter;
+export default userRouter;

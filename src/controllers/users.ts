@@ -20,9 +20,9 @@ export const createUser = (req: Request, res: Response) => {
 };
 
 // Обновление данных пользователя
-export const updateUser = (req: Request | any, res: Response) => {
+export const updateUser = (req: Request, res: Response) => {
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user?._id,
     req.body,
     { new: true, runValidators: true },
   )
@@ -32,10 +32,10 @@ export const updateUser = (req: Request | any, res: Response) => {
           .status(errorsCode.notFound.code)
           .send({ message: errorsCode.notFound.message });
       }
-      return res.status(successCode.REQUEST).send({ data: user });
+      return res.status(successCode.REQUEST).send(user);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'ValidationError') {
+      if (error instanceof mongoose.Error && error.name === "ValidationError") {
         return res
           .status(errorsCode.dataUncorrect.code)
           .send({ message: errorsCode.dataUncorrect.message });
@@ -50,7 +50,7 @@ export const updateUser = (req: Request | any, res: Response) => {
 export const getAllUsers = (req: Request, res: Response) => {
   User.find({})
     .then((users) => {
-      res.status(successCode.REQUEST).send({ data: users });
+      res.status(successCode.REQUEST).send(users);
     })
     .catch(() => {
       res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
@@ -66,10 +66,10 @@ export const getUser = (req: Request, res: Response) => {
           .status(errorsCode.notFound.code)
           .send({ message: errorsCode.notFound.message });
       }
-      return res.status(successCode.REQUEST).send({ data: user });
+      return res.status(successCode.REQUEST).send(user);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error.CastError) {
+      if (error instanceof mongoose.Error && error.name === "CastError") {
         return res
           .status(errorsCode.dataUncorrect.code)
           .send({ message: errorsCode.dataUncorrect.message });
@@ -81,9 +81,9 @@ export const getUser = (req: Request, res: Response) => {
 };
 
 // Обновление авы пользователя
-export const updateAvatar = (req: Request | any, res: Response) => {
+export const updateAvatar = (req: Request, res: Response) => {
   User.findByIdAndUpdate(
-    req.user._id,
+    req.user?._id,
     req.body,
     { new: true, runValidators: true },
   )
