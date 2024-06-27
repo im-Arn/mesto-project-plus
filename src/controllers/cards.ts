@@ -37,7 +37,7 @@ export const deleteCard = (req: Request, res: Response) => {
       return res.status(successCode.REQUEST).send(card);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === "CastError") {
+      if (error instanceof mongoose.Error && error.name === 'CastError') {
         return res
           .status(errorsCode.dataUncorrect.code)
           .send({ message: errorsCode.dataUncorrect.message });
@@ -73,7 +73,7 @@ export const likeCard = (req: Request, res: Response) => {
       return res.send(card);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === "CastError") {
+      if (error instanceof mongoose.Error && error.name === 'CastError') {
         return res.status(errorsCode.dataUncorrect.code).send({ message: errorsCode.dataUncorrect.message });
       }
       return res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
@@ -95,7 +95,7 @@ export const dislikeCard = (req: Request, res: Response) => {
       return res.send(card);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === "CastError") {
+      if (error instanceof mongoose.Error && error.name === 'CastError') {
         return res
           .status(errorsCode.dataUncorrect.code)
           .send({ message: errorsCode.dataUncorrect.message });
