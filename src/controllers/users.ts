@@ -58,7 +58,7 @@ export const updateUserData = (req: Request, res: Response) => {
   User.findByIdAndUpdate(
     req.user?._id,
     req.body,
-    { new: true },
+    { new: true, runValidators: true },
   )
     .then((user) => {
       if (!user) {
