@@ -1,18 +1,7 @@
-type TSuccessCode = {
-  REQUEST: number,
-  CREATE: number,
-};
-
-type TErrorObject = {
-  code: number,
-  message: string,
-};
-
-type TErrorsObject = {
-  dataUncorrect: TErrorObject,
-  notFound: TErrorObject,
-  server: TErrorObject,
-};
+import {
+  TSuccessCode,
+  TErrorsObject,
+} from './types';
 
 export const successCode: TSuccessCode = {
   REQUEST: 200,
