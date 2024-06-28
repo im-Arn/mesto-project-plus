@@ -37,7 +37,7 @@ export const deleteCard = (req: Request, res: Response) => {
       return res.status(successCode.REQUEST).send(card);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === "CastError") {
+      if (error instanceof mongoose.Error && error.name === 'CastError') {
         return res
           .status(errorsCode.dataUncorrect.code)
           .send({ message: errorsCode.dataUncorrect.message });
@@ -64,7 +64,7 @@ export const likeCard = (req: Request, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user?._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .then((card) => {
       if (!card) {
@@ -73,7 +73,7 @@ export const likeCard = (req: Request, res: Response) => {
       return res.send(card);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === "CastError") {
+      if (error instanceof mongoose.Error && error.name === 'CastError') {
         return res.status(errorsCode.dataUncorrect.code).send({ message: errorsCode.dataUncorrect.message });
       }
       return res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
@@ -84,7 +84,7 @@ export const dislikeCard = (req: Request, res: Response) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user?._id } },
-    { new: true, runValidators: true },
+    { new: true },
   )
     .then((card) => {
       if (!card) {
@@ -95,7 +95,7 @@ export const dislikeCard = (req: Request, res: Response) => {
       return res.send(card);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === "CastError") {
+      if (error instanceof mongoose.Error && error.name === 'CastError') {
         return res
           .status(errorsCode.dataUncorrect.code)
           .send({ message: errorsCode.dataUncorrect.message });
