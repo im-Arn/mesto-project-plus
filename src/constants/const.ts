@@ -1,6 +1,7 @@
 import {
   TSuccessCode,
   TErrorsObject,
+  TProfileDef,
 } from './types';
 
 export const successCode: TSuccessCode = {
@@ -22,3 +23,9 @@ export const errorsCode: TErrorsObject = {
     message: 'На сервере произошла ошибка',
   },
 };
+
+export const defaultProfile: TProfileDef = {
+  name: 'Жак-Ив Кусто',
+  about: 'Исследователь',
+  avatar: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+}

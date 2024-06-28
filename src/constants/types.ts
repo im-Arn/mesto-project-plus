@@ -21,3 +21,9 @@ export type TErrorsObject = {
   notFound: TErrorObject,
   server: TErrorObject,
 };
+
+export type TProfileDef = {
+  name: string,
+  about: string,
+  avatar: string,
+}
