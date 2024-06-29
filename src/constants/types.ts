@@ -18,7 +18,10 @@ export type TErrorObject = {
 
 export type TErrorsObject = {
   dataUncorrect: TErrorObject,
+  authError: TErrorObject,
+  forbidden: TErrorObject,
   notFound: TErrorObject,
+  conflict: TErrorObject,
   server: TErrorObject,
 };
 

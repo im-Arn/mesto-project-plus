@@ -14,9 +14,21 @@ export const errorsCode: TErrorsObject = {
     code: 400,
     message: 'Использованы некорректные данные',
   },
+  authError: {
+    code: 401,
+    message: 'Необходимо залогиниться',
+  },
+  forbidden: {
+    code: 403,
+    message: 'Необходимо залогиниться',
+  },
   notFound: {
     code: 404,
     message: 'Запрашиваемые данные не найдены',
+  },
+  conflict: {
+    code: 409,
+    message: 'Данный e-mail уже используется',
   },
   server: {
     code: 500,
