@@ -1,4 +1,4 @@
-import { errorsCode } from "../constants/const";
+import { errorsCode } from '../constants/const';
 
 class DataUncorrectError extends Error {
   statusCode: number;

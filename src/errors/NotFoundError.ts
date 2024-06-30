@@ -1,4 +1,4 @@
-import { errorsCode } from "../constants/const";
+import { errorsCode } from '../constants/const';
 
 class NotFoundError extends Error {
   statusCode: number;

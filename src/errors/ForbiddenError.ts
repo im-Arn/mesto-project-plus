@@ -1,4 +1,4 @@
-import { errorsCode } from "../constants/const";
+import { errorsCode } from '../constants/const';
 
 class ForbiddenError extends Error {
   statusCode: number;
