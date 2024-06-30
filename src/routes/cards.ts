@@ -6,14 +6,18 @@ import {
   likeCard,
   dislikeCard,
 } from '../controllers/cards';
+import {
+  valCreateCard,
+  valCardId,
+} from '../constants/validate';
 
 // Cоздаём роутер и роуты
 const cardRouter = Router();
 
-cardRouter.post('/', createCard);
-cardRouter.delete('/:cardId', deleteCard);
+cardRouter.post('/', valCreateCard, createCard);
+cardRouter.delete('/:cardId', valCardId, deleteCard);
 cardRouter.get('/', getCards);
-cardRouter.put('/:cardId/likes', likeCard);
-cardRouter.delete('/:cardId/likes', dislikeCard);
+cardRouter.put('/:cardId/likes', valCardId, likeCard);
+cardRouter.delete('/:cardId/likes', valCardId, dislikeCard);
 
 export default cardRouter;
