@@ -1,23 +1,23 @@
 import { model, Schema } from 'mongoose';
 
-export type TUser = {
+export interface IUser {
   name: string;
   about: string;
   avatar: string;
-};
+}
 
-const userSchema = new Schema<TUser>({
+const userSchema = new Schema<IUser>({
   name: {
     type: String,
+    required: true,
     minlength: 2,
     maxlength: 30,
-    required: true,
   },
   about: {
     type: String,
+    required: true,
     minlength: 2,
     maxlength: 200,
-    required: true,
   },
   avatar: {
     type: String,
@@ -25,4 +25,4 @@ const userSchema = new Schema<TUser>({
   },
 });
 
-export default model<TUser>('user', userSchema);
+export default model<IUser>('user', userSchema);

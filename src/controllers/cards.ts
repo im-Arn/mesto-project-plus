@@ -1,105 +1,92 @@
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import Card from '../models/card';
-import { STATUS_CREATED, STATUS_OK } from '../utilits/const';
+import {
+  STATUS_CREATED,
+  STATUS_OK, serverError,
+  badRequestError,
+  notFoundError,
+} from '../utilits/utils';
 
-// Создание карточки
-export const createCard = (req: Request, res: Response) => {
-  const { name, link } = req.body;
-  Card.create({
-    name,
-    link,
-    owner: req.user?._id,
-  })
-    .then((card) => res.status(STATUS_CREATED).send(card))
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'ValidationError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
-      }
-      return res
-        .status(errorsCode.server.code)
-        .send({ message: errorsCode.server.message });
-    });
+export const getCards = async (req: Request, res: Response) => {
+  try {
+    const cards = await Card.find({});
+    return res.status(STATUS_OK).send(cards);
+  } catch (error) {
+    return res.status(serverError.error).send({ message: serverError.message });
+  }
 };
 
-// Удаление карточки
-export const deleteCard = (req: Request, res: Response) => {
+export const createCard = async (req: Request | any, res: Response) => {
+  try {
+    const ownerId = req.user._id;
+    const card = await Card.create({ name: req.body.name, link: req.body.link, owner: ownerId });
+    return res.status(STATUS_CREATED).send(card);
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(badRequestError.error).send({ message: badRequestError.message });
+    }
+    return res.status(serverError.error).send({ message: serverError.error });
+  }
+};
+
+export const deleteCard = async (req: Request, res: Response) => {
   const { cardId } = req.params;
-  Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (!card) {
-        return res
-          .status(errorsCode.notFound.code)
-          .send({ message: errorsCode.notFound.message });
-      }
-      return res.status(STATUS_OK).send(card);
-    })
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'CastError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
-      }
+  try {
+    const card = await Card.findByIdAndRemove(cardId);
+
+    if (!card) {
+      return res.status(notFoundError.error).send({ message: notFoundError.message });
+    }
+    return res.status(STATUS_OK).send(card);
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      return res.status(badRequestError.error).send({ message: badRequestError.message });
+    }
+    return res.status(serverError.error).send({ message: serverError.message });
+  }
+};
+
+export const likeCard = async (req: Request | any, res: Response) => {
+  try {
+    const card = await Card.findByIdAndUpdate(
+      req.params.cardId,
+      { $addToSet: { likes: req.user._id } },
+      { new: true },
+    );
+    if (!card) {
+      return res.status(notFoundError.error).send({ message: notFoundError.message });
+    }
+    return res.send(card);
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
+      return res.status(badRequestError.error).send({ message: badRequestError.message });
+    }
+    return res.status(serverError.error).send({ message: serverError.message });
+  }
+};
+
+export const dislikeCard = async (req: Request | any, res: Response) => {
+  try {
+    const { cardId } = req.params;
+    const card = await Card.findByIdAndUpdate(
+      cardId,
+      { $pull: { likes: req.user._id } },
+      { new: true },
+    );
+
+    if (!card) {
+      return res.status(notFoundError.error).send({ message: notFoundError.message });
+    }
+
+    return res.send(card);
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
       return res
-        .status(errorsCode.server.code)
-        .send({ message: errorsCode.server.message });
-    });
-};
+        .status(badRequestError.error)
+        .send({ message: badRequestError.message });
+    }
 
-// Все карточки
-export const getCards = (req: Request, res: Response) => {
-  Card.find({})
-    .then((cards) => {
-      res.status(STATUS_OK).send(cards);
-    })
-    .catch(() => {
-      res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
-    });
-};
-
-// Лайки
-export const likeCard = (req: Request, res: Response) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $addToSet: { likes: req.user?._id } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        return res.status(errorsCode.notFound.code).send({ message: errorsCode.notFound.message });
-      }
-      return res.send(card);
-    })
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'CastError') {
-        return res.status(errorsCode.dataUncorrect.code).send({ message: errorsCode.dataUncorrect.message });
-      }
-      return res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
-    });
-};
-
-export const dislikeCard = (req: Request, res: Response) => {
-  Card.findByIdAndUpdate(
-    req.params.cardId,
-    { $pull: { likes: req.user?._id } },
-    { new: true },
-  )
-    .then((card) => {
-      if (!card) {
-        return res
-          .status(errorsCode.notFound.code)
-          .send({ message: errorsCode.notFound.message });
-      }
-      return res.send(card);
-    })
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'CastError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
-      }
-      return res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
-    });
+    return res.status(serverError.error).send({ message: serverError.message });
+  }
 };

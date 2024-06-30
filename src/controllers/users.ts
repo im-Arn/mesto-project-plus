@@ -1,87 +1,86 @@
-import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import { Request, Response } from 'express';
 import User from '../models/user';
-import { STATUS_OK, STATUS_CREATED } from '../utilits/const';
+import {
+  STATUS_CREATED,
+  STATUS_OK,
+  serverError,
+  badRequestError,
+  notFoundError,
+} from '../utilits/utils';
 
-// Создание пользователя
-export const createUser = (req: Request, res: Response) => {
-  User.create(req.body)
-    .then((user) => res.status(STATUS_CREATED).send(user))
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'ValidationError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
-      }
+export const createUser = async (req: Request, res: Response) => {
+  try {
+    const { name, about, avatar } = req.body;
+    const user = await User.create({ name, about, avatar });
+    return res.status(STATUS_CREATED).send(user);
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(badRequestError.error).send({ message: badRequestError.message });
+    }
+    return res.status(serverError.error).send({ message: serverError.message });
+  }
+};
+
+export const getUsers = (req: Request, res: Response) => User.find({})
+  .then((users) => res.send(users))
+  .catch(() => res.status(serverError.error).send({ message: serverError.message }));
+
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(notFoundError.error).send({ message: notFoundError.message });
+    }
+    return res.status(STATUS_OK).send(user);
+  } catch (error) {
+    if (error instanceof mongoose.Error.CastError) {
       return res
-        .status(errorsCode.server.code)
-        .send({ message: errorsCode.server.message });
-    });
+        .status(badRequestError.error).send({ message: badRequestError.message });
+    }
+    return res.status(serverError.error).send({ message: serverError.message });
+  }
 };
 
-// Список всех пользователей
-export const getAllUsers = (req: Request, res: Response) => {
-  User.find({})
-    .then((users) => {
-      res.status(STATUS_OK).send(users);
-    })
-    .catch(() => {
-      res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
-    });
+export const updateUserInfo = async (req: Request | any, res: Response) => {
+  try {
+    const { name, about } = req.body;
+    const currentUser = req.user._id;
+    const updatedUser = await User.findByIdAndUpdate(
+      currentUser,
+      { name, about },
+      { new: true, runValidators: true },
+    );
+    if (!updatedUser) {
+      return res.status(notFoundError.error).send({ message: notFoundError.message });
+    }
+    return res.status(STATUS_OK).send(updatedUser);
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(badRequestError.error).send({ message: badRequestError.message });
+    }
+    return res.status(serverError.error).send({ message: serverError.message });
+  }
 };
 
-// Конкретный пользователь
-export const getUser = (req: Request, res: Response) => {
-  User.findById(req.params.userId)
-    .then((user) => {
-      if (!user) {
-        return res
-          .status(errorsCode.notFound.code)
-          .send({ message: errorsCode.notFound.message });
-      }
-      return res.status(STATUS_OK).send(user);
-    })
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'CastError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
-      }
-      return res
-        .status(errorsCode.server.code)
-        .send({ message: errorsCode.server.message });
-    });
+export const updateUserAvatar = async (req: Request | any, res: Response) => {
+  try {
+    const { avatar } = req.body;
+    const currentUser = req.user._id;
+    const updatedUser = await User.findByIdAndUpdate(
+      currentUser,
+      { avatar },
+      { new: true, runValidators: true },
+    );
+    if (!updatedUser) {
+      return res.status(notFoundError.error).send({ message: notFoundError.message });
+    }
+    return res.status(STATUS_OK).send(updatedUser);
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(badRequestError.error).send({ message: badRequestError.message });
+    }
+    return res.status(badRequestError.error).send({ message: badRequestError.message });
+  }
 };
-
-// Декораш
-export const updateUserData = (req: Request, res: Response) => {
-  User.findByIdAndUpdate(
-    req.user?._id,
-    req.body,
-    { new: true, runValidators: true },
-  )
-    .then((user) => {
-      if (!user) {
-        return res
-          .status(errorsCode.notFound.code)
-          .send({ message: errorsCode.notFound.message });
-      }
-      return res.status(successCode.REQUEST).send(user);
-    })
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'ValidationError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
-      }
-      return res
-        .status(errorsCode.server.code)
-        .send(errorsCode.server.message);
-    });
-};
-
-// Обновление аватара пользователя
-export const updateAvatar = (req: Request, res: Response) => { updateUserData(req, res); };
-
-// Обновление данных пользователя
-export const updateUser = (req: Request, res: Response) => { updateUserData(req, res); };

@@ -1,8 +1,8 @@
 import {
   Schema,
   model,
-  Date,
   ObjectId,
+  Date,
 } from 'mongoose';
 
 type TCard = {
@@ -32,7 +32,6 @@ const cardSchema = new Schema<TCard>(
     },
     likes: {
       type: [Schema.Types.ObjectId],
-      ref: 'user',
       default: [],
     },
     createdAt: {
