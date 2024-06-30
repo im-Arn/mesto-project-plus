@@ -1,13 +1,15 @@
 import { Request, Response, Router } from 'express';
 import userRouter from './users';
 import cardRouter from './cards';
-import { errorsCode } from '../constants/const';
+import { notFoundError } from '../utilits/const';
 
 const routes = Router();
 
 routes
-  .use('/users', userRouter)
+
   .use('/cards', cardRouter)
-  .use((req: Request, res: Response) => res.status(errorsCode.notFound.code).send({ message: errorsCode.notFound.message }));
+  .use('/users', userRouter)
+  .use((req: Request, res: Response) =>
+    res.status(notFoundError.code).send({ message: notFoundError.message }));
 
 export default routes;

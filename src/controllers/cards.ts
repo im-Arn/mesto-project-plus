@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import Card from '../models/card';
-import { successCode, errorsCode } from '../constants/const';
+import { STATUS_CREATED, STATUS_OK } from '../utilits/const';
 
 // Создание карточки
 export const createCard = (req: Request, res: Response) => {
@@ -11,7 +11,7 @@ export const createCard = (req: Request, res: Response) => {
     link,
     owner: req.user?._id,
   })
-    .then((card) => res.status(successCode.CREATE).send(card))
+    .then((card) => res.status(STATUS_CREATED).send(card))
     .catch((error) => {
       if (error instanceof mongoose.Error && error.name === 'ValidationError') {
         return res
@@ -34,7 +34,7 @@ export const deleteCard = (req: Request, res: Response) => {
           .status(errorsCode.notFound.code)
           .send({ message: errorsCode.notFound.message });
       }
-      return res.status(successCode.REQUEST).send(card);
+      return res.status(STATUS_OK).send(card);
     })
     .catch((error) => {
       if (error instanceof mongoose.Error && error.name === 'CastError') {
@@ -52,7 +52,7 @@ export const deleteCard = (req: Request, res: Response) => {
 export const getCards = (req: Request, res: Response) => {
   Card.find({})
     .then((cards) => {
-      res.status(successCode.REQUEST).send(cards);
+      res.status(STATUS_OK).send(cards);
     })
     .catch(() => {
       res.status(errorsCode.server.code).send({ message: errorsCode.server.message });

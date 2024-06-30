@@ -7,13 +7,12 @@ import {
   dislikeCard,
 } from '../controllers/cards';
 
-// Cоздаём роутер и роуты
-const cardRouter = Router();
+const router = Router();
 
-cardRouter.post('/', createCard);
-cardRouter.delete('/:cardId', deleteCard);
-cardRouter.get('/', getCards);
-cardRouter.put('/:cardId/likes', likeCard);
-cardRouter.delete('/:cardId/likes', dislikeCard);
+router.get('/', getCards);
+router.put('/:cardId/likes', likeCard);
+router.delete('/:cardId/likes', dislikeCard);
+router.post('/', createCard);
+router.delete('/:cardId', deleteCard);
 
-export default cardRouter;
+export default router;

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import User from '../models/user';
-import { successCode, errorsCode } from '../constants/const';
+import { STATUS_OK, STATUS_CREATED } from '../utilits/const';
 
 // Создание пользователя
 export const createUser = (req: Request, res: Response) => {
   User.create(req.body)
-    .then((user) => res.status(successCode.CREATE).send(user))
+    .then((user) => res.status(STATUS_CREATED).send(user))
     .catch((error) => {
       if (error instanceof mongoose.Error && error.name === 'ValidationError') {
         return res
@@ -23,7 +23,7 @@ export const createUser = (req: Request, res: Response) => {
 export const getAllUsers = (req: Request, res: Response) => {
   User.find({})
     .then((users) => {
-      res.status(successCode.REQUEST).send(users);
+      res.status(STATUS_OK).send(users);
     })
     .catch(() => {
       res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
@@ -39,7 +39,7 @@ export const getUser = (req: Request, res: Response) => {
           .status(errorsCode.notFound.code)
           .send({ message: errorsCode.notFound.message });
       }
-      return res.status(successCode.REQUEST).send(user);
+      return res.status(STATUS_OK).send(user);
     })
     .catch((error) => {
       if (error instanceof mongoose.Error && error.name === 'CastError') {

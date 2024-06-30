@@ -7,13 +7,12 @@ import {
   updateAvatar,
 } from '../controllers/users';
 
-// Cоздаём роутер и роуты
-const userRouter = Router();
+const router = Router();
 
-userRouter.post('/', createUser);
-userRouter.patch('/me', updateUser);
-userRouter.get('/', getAllUsers);
-userRouter.get('/:userId', getUser);
-userRouter.patch('/me/avatar', updateAvatar);
+router.post('/', createUser);
+router.patch('/me', updateUser);
+router.get('/', getAllUsers);
+router.get('/:userId', getUser);
+router.patch('/me/avatar', updateAvatar);
 
-export default userRouter;
+export default router;
