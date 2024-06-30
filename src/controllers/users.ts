@@ -1,60 +1,67 @@
-import { Request, Response } from 'express';
+import {
+  Request,
+  Response,
+  NextFunction,
+} from 'express';
 import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 import User from '../models/user';
 import { successCode, errorsCode } from '../constants/const';
+import ConflictError from '../errors/ConflictError';
+import DataUncorrectError from '../errors/DataUncorrectError';
+import NotFoundError from '../errors/NotFoundError';
 
 // Создание пользователя
-export const createUser = (req: Request, res: Response) => {
-  User.create(req.body)
-    .then((user) => res.status(successCode.CREATE).send(user))
-    .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'ValidationError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
+export const createUser = (req: Request, res: Response, next: NextFunction) => {
+  const { name, about, avatar, email } = req.body;
+  return bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({ email, password: hash, name, about, avatar }))
+    .then((user) => res.status(successCode.CREATE).send({ user }))
+    .catch((error: any) => {
+      if (error.code === 11000) {
+        return next(new ConflictError(errorsCode.conflict.message));
       }
-      return res
-        .status(errorsCode.server.code)
-        .send({ message: errorsCode.server.message });
+      if (error instanceof Error && error.name === 'ValidationError') {
+        return next(new DataUncorrectError(errorsCode.dataUncorrect.message));
+      }
+      return next(error);
     });
 };
 
 // Список всех пользователей
-export const getAllUsers = (req: Request, res: Response) => {
+export const getAllUsers = (req: Request, res: Response, next: NextFunction) => {
   User.find({})
     .then((users) => {
       res.status(successCode.REQUEST).send(users);
     })
-    .catch(() => {
-      res.status(errorsCode.server.code).send({ message: errorsCode.server.message });
-    });
+    .catch(next);
 };
 
-// Конкретный пользователь
-export const getUser = (req: Request, res: Response) => {
-  User.findById(req.params.userId)
+// Декораш поиска пользователя
+export const findUser = (req: Request | JwtPayload, res: Response, next: NextFunction, letter: string) => {
+  User.findById(letter === 'me' ? req.user!._id : req.params.userId)
     .then((user) => {
       if (!user) {
-        return res
-          .status(errorsCode.notFound.code)
-          .send({ message: errorsCode.notFound.message });
+        return next(new NotFoundError(errorsCode.notFound.message));
       }
       return res.status(successCode.REQUEST).send(user);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'CastError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
+      if (error instanceof mongoose.Error.CastError) {
+        return next(new DataUncorrectError(errorsCode.dataUncorrect.message));
       }
-      return res
-        .status(errorsCode.server.code)
-        .send({ message: errorsCode.server.message });
+      return next(error);
     });
 };
 
-// Декораш
-export const updateUserData = (req: Request, res: Response) => {
+// Любой пользователь
+export const getUser = (req: Request, res: Response, next: NextFunction) => { findUser(req, res, next, 'notme'); };
+// Залогиненный пользователь
+export const getCurrentUser = (req: Request | JwtPayload, res: Response, next: NextFunction) => { findUser(req, res, next, 'me'); };
+
+// Декораш обновления данных
+export const updateUserData = (req: Request, res: Response, next: NextFunction) => {
   User.findByIdAndUpdate(
     req.user?._id,
     req.body,
@@ -62,26 +69,37 @@ export const updateUserData = (req: Request, res: Response) => {
   )
     .then((user) => {
       if (!user) {
-        return res
-          .status(errorsCode.notFound.code)
-          .send({ message: errorsCode.notFound.message });
+        return next(new NotFoundError(errorsCode.notFound.message));
       }
       return res.status(successCode.REQUEST).send(user);
     })
     .catch((error) => {
-      if (error instanceof mongoose.Error && error.name === 'ValidationError') {
-        return res
-          .status(errorsCode.dataUncorrect.code)
-          .send({ message: errorsCode.dataUncorrect.message });
+      if (error instanceof mongoose.Error.ValidationError) {
+        return next(new DataUncorrectError(errorsCode.dataUncorrect.message));
       }
-      return res
-        .status(errorsCode.server.code)
-        .send(errorsCode.server.message);
+      return next(error);
     });
 };
 
 // Обновление аватара пользователя
-export const updateAvatar = (req: Request, res: Response) => { updateUserData(req, res); };
+export const updateAvatar = (req: Request, res: Response, next: NextFunction) => { updateUserData(req, res, next); };
 
 // Обновление данных пользователя
-export const updateUser = (req: Request, res: Response) => { updateUserData(req, res); };
+export const updateUser = (req: Request, res: Response, next: NextFunction) => { updateUserData(req, res, next); };
+
+// Логин
+export const loginUser = (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      res.send({ token });
+    })
+    .catch((error) => {
+      if (error instanceof mongoose.Error.ValidationError) {
+        return next(new DataUncorrectError(errorsCode.dataUncorrect.message));
+      }
+      return next(error);
+    });
+};

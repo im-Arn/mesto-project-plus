@@ -1,3 +1,5 @@
+import validator from 'validator';
+
 import {
   Schema,
   model,
@@ -24,6 +26,7 @@ const cardSchema = new Schema<TCard>(
     link: {
       type: String,
       required: true,
+      validate: (v: string) => validator.isURL(v),
     },
     owner: {
       type: Schema.Types.ObjectId,
