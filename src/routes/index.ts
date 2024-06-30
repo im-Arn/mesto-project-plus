@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import userRouter from './users';
 import cardRouter from './cards';
-import { errorsCode } from '../constants/const';
+import { errorsCode } from '../utils/const';
 
 const routes = Router();
 

@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import Card from '../models/card';
-import { successCode, errorsCode } from '../constants/const';
+import { successCode, errorsCode } from '../utils/const';
 
 // Создание карточки
 export const createCard = (req: Request, res: Response) => {

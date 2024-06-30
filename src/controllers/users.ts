@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import User from '../models/user';
-import { successCode, errorsCode } from '../constants/const';
+import { successCode, errorsCode } from '../utils/const';
 
 // Создание пользователя
 export const createUser = (req: Request, res: Response) => {
