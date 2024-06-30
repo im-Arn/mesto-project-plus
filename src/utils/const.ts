@@ -1,7 +1,7 @@
 import {
   TSuccessCode,
   TErrorsObject,
-} from './types';
+} from '../constants/types';
 
 export const successCode: TSuccessCode = {
   REQUEST: 200,
