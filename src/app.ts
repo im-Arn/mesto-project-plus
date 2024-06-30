@@ -21,9 +21,9 @@ app.post('/signin', valLogin, loginUser); // роуты
 app.post('/signup', valUser, createUser); // роуты
 // Аутентификация
 app.use(auth);
-app.use(errorLogger);
 // Импортируем роуты со всего приложения
 app.use(routes);
+app.use(errorLogger); // нужно ставить после роутов
 app.use(errors());
 app.use(handleServerErrors);
 

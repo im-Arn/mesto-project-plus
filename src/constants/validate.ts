@@ -41,7 +41,6 @@ export const valCardId = celebrate({ params: Joi.object().keys({ cardId: Joi.str
 // getUser
 export const valUserId = celebrate({
   params: Joi.object().keys({
-    userId: Joi.string().length(24).hex().required()
-      .required(),
+    userId: Joi.string().length(24).hex().required(),
   }),
 });
